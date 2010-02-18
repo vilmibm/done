@@ -2,8 +2,64 @@ done -- a simple, elegant command line todo list tool
 
 done is a todo list tool designed for me. You might enjoy it, as well.
 
-It was inspired by the interface to Darcs. It is also written in Haskell.
+It was inspired by:
+    the darcs UI
+    timebook.py
+    todo.sh
+    remember the milk
+and aims to distill my favorite aspects of each of these tools into one, useful tool.
+
+It's written in Haskell because I want to learn Haskell.
 
 It uses sqlite3.
 
 Note: I'm still a fledgling Haskell programmer. Progress on this project will be glacial.
+
+Design notes:
+
+Usage:
+    d [aldbh] [-s] task
+
+###
+
+$: d a '7708 check logs again due:tomorrow'
+$: d a '7848 write trigger'
+$: d a '7848 write function'
+$: d l
+    7708 check logs again (due 17 Feb 2010)
+    7848 write trigger
+    7848 write function
+$: d l -s name
+    7708 check logs again (due 17 Feb 2010)
+    7848 write function
+    7848 write trigger
+$: d l 7848
+    7848 write trigger
+    7848 write function
+$: d l 'due:tomorrow'
+    7708 check logs again (due 17 Feb 2010)
+$: d d 7708
+    finished with...
+        7708 check logs again (due 17 Feb 2010)? [y/N]:y
+    X 7708 check logs again (due 17 Feb 2010)
+$: d d 7848
+    finished with...
+        7848 write trigger? [y/N]:y
+        7848 write function? [y/N]:n
+    X 7848 write trigger
+$: d l
+    7848 write function
+$: d b
+    quit and spawn sqlite3 instance
+$: d h
+    Usage: ...
+
+###
+
+DB schema:
+tasks
+    id primary key
+    desc text
+    due_date_ts integer
+    created_ts integer
+    done boolean
