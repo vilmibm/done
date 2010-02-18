@@ -1,0 +1,9 @@
+done -- a simple, elegant command line todo list tool
+
+done is a todo list tool designed for me. You might enjoy it, as well.
+
+It was inspired by the interface to Darcs. It is also written in Haskell.
+
+It uses sqlite3.
+
+Note: I'm still a fledgling Haskell programmer. Progress on this project will be glacial.
