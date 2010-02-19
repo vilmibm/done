@@ -14,6 +14,7 @@ import Database.HDBC.Sqlite3
 initDB dbh = do
     run dbh "CREATE TABLE tasks (id integer primary key, desc text, due_date integer, created_ts integer, done boolean)" []
     commit dbh
+    return ()
 
 connectDB :: IO Connection
 connectDB = do
@@ -21,24 +22,24 @@ connectDB = do
     setBusyTimeout dbh 5000
     return dbh
 
-runCommand :: String -> [String] -> IO ()
-runCommand cmd argv = 
+runCommand :: String -> Connection -> [String] -> IO ()
+runCommand cmd dbh argv =
     case cmd of
-        "a" -> add argv
-        "d" -> done argv
-        "l" -> list argv
+        "a" -> add dbh argv
+        "d" -> done dbh argv
+        "l" -> list dbh argv
         "b" -> backend
         "h" -> help
         _   -> putStrLn $ "I don't understand: " ++ cmd
 
-add :: [String] -> IO ()
-add argv = putStrLn "add a task"
+add :: Connection -> [String] -> IO ()
+add dbh argv = putStrLn "add a task"
 
-done :: [String] -> IO ()
-done argv = putStrLn "finish a task"
+done :: Connection -> [String] -> IO ()
+done dbh argv = putStrLn "finish a task"
 
-list :: [String] -> IO ()
-list argv = putStrLn "list tasks"
+list :: Connection -> [String] -> IO ()
+list dbh argv = putStrLn "list tasks"
 
 backend :: IO ()
 backend = putStrLn "launch sqlite3"
@@ -48,11 +49,10 @@ help = putStrLn "available commands: aldh"
 
 main :: IO ()
 main = do
-    -- if not DB, init
-    dbh <- connectDB
     foundDB <- doesFileExist "done.db"
-    if foundDB then putStrLn "found db" else (initDB dbh)
+    dbh <- connectDB -- possibly creates file, but we still need to init schema
+    if foundDB then putStrLn "" else initDB dbh --This is bad. How to do better?
     argv <- getArgs
     case argv of
         [] -> help
-        _  -> runCommand (head argv) (tail argv) 
+        _  -> runCommand (head argv) dbh (tail argv) 
