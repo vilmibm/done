@@ -3,21 +3,26 @@
 -- why  an elegant and basic approach to todo listing
 -- when feb 2010
 
+import System.IO
+import System.Directory
 import System.Environment ( getArgs )
 import Database.HDBC
 import Database.HDBC.Sqlite3
 
 -- adlbh
 
-connect :: IO Connection
-connect = do
-    dbh <- connectSqlite3 "do.db"
+initDB dbh = do
+    run dbh "CREATE TABLE tasks (id integer primary key, desc text, due_date integer, created_ts integer, done boolean)" []
+    commit dbh
+
+connectDB :: IO Connection
+connectDB = do
+    dbh <- connectSqlite3 "done.db"
     setBusyTimeout dbh 5000
-    -- prepDB dbh
     return dbh
 
-run_command :: String -> [String] -> IO ()
-run_command cmd argv = 
+runCommand :: String -> [String] -> IO ()
+runCommand cmd argv = 
     case cmd of
         "a" -> add argv
         "d" -> done argv
@@ -43,7 +48,11 @@ help = putStrLn "available commands: aldh"
 
 main :: IO ()
 main = do
+    -- if not DB, init
+    dbh <- connectDB
+    foundDB <- doesFileExist "done.db"
+    if foundDB then putStrLn "found db" else (initDB dbh)
     argv <- getArgs
     case argv of
         [] -> help
-        _  -> run_command (head argv) (tail argv)
+        _  -> runCommand (head argv) (tail argv) 
