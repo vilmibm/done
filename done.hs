@@ -4,17 +4,11 @@
 -- when feb 2010
 
 import System.IO
-import System.Directory
 import System.Environment ( getArgs )
 import Database.HDBC
 import Database.HDBC.Sqlite3
 
 -- adlbh
-
-initDB dbh = do
-    run dbh "CREATE TABLE tasks (id integer primary key, desc text, due_date integer, created_ts integer, done boolean)" []
-    commit dbh
-    return ()
 
 connectDB :: IO Connection
 connectDB = do
@@ -22,8 +16,8 @@ connectDB = do
     setBusyTimeout dbh 5000
     return dbh
 
-runCommand :: String -> Connection -> [String] -> IO ()
-runCommand cmd dbh argv =
+runCommand :: Connection -> String -> [String] -> IO ()
+runCommand dbh cmd argv =
     case cmd of
         "a" -> add dbh argv
         "d" -> done dbh argv
@@ -49,10 +43,8 @@ help = putStrLn "available commands: aldh"
 
 main :: IO ()
 main = do
-    foundDB <- doesFileExist "done.db"
-    dbh <- connectDB -- possibly creates file, but we still need to init schema
-    if foundDB then putStrLn "" else initDB dbh --This is bad. How to do better?
+    dbh <- connectDB 
     argv <- getArgs
     case argv of
         [] -> help
-        _  -> runCommand (head argv) dbh (tail argv) 
+        _  -> runCommand dbh (head argv) (tail argv) 
