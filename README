@@ -18,8 +18,16 @@ Note: I'm still a fledgling Haskell programmer. Progress on this project will be
 Design notes:
 
 Usage:
-    d [aldbh] [-s] task
-
+    d a [-d due] task
+        add a task, optional natural language due date
+    d l [-s (due|created|alpha)] [filter]
+        list out tasks, optional sort, optional filter
+    d d [filter]
+        go through tasks to mark finished ones, optional filter
+    d b
+        launch sqlite3 backend
+    d h
+        help message
 ###
 
 $: d a '7708 check logs again' -d tomorrow
