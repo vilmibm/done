@@ -15,6 +15,17 @@ It uses sqlite3.
 
 Note: I'm still a fledgling Haskell programmer. Progress on this project will be glacial.
 
+NOTES:
+currently implemented:
+    adding (but not due dates)
+    listing
+
+stubbed:
+    due dates
+    go to backend
+    finishing
+    better usage message
+
 Design notes:
 
 Usage:
