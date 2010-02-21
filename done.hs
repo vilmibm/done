@@ -10,10 +10,7 @@ import Database.HDBC.Sqlite3
 
 -- adlbh
 
-
--- add into db, check for due date
---add :: Connection -> [String] -> IO ()
---add dbh argv = putStrLn "add a task"
+---- add task
 add :: Connection -> [String] -> IO ()
 add dbh argv = do
     case argv of
@@ -25,22 +22,44 @@ add dbh argv = do
 insertTask :: Connection -> String -> IO ()
 insertTask dbh desc = do
     run dbh "INSERT INTO tasks VALUES (null, ?, null, (SELECT CURRENT_TIMESTAMP), 'f')" [toSql desc]
-    putStrLn $ "added " ++ desc
+    commit dbh
+    putStrLn $ "\tadded " ++ desc
 
 insertTaskDueDate :: Connection -> String -> String -> IO ()
 insertTaskDueDate dbh desc due = do
     run dbh "INSERT INTO tasks VALUES (null, ?, ?, (SELECT CURRENT_TIMESTAMP), 'f')" [toSql desc, (toSql (parseDate due))]
-    putStrLn $ "added " ++ desc ++ " (due: " ++ (parseDate due) ++ ")"
+    commit dbh
+    putStrLn $ "\tadded " ++ desc ++ " (due: " ++ (parseDate due) ++ ")"
 
+-- stubbed for now:
 parseDate :: String -> String
 parseDate due = "2011-02-21 19:55:17"
 
+---- finish a task
 done :: Connection -> [String] -> IO ()
 done dbh argv = putStrLn "finish a task"
 
+---- list out tasks
+--list :: Connection -> [String] -> IO ()
+--list dbh argv = putStrLn "list tasks"
 list :: Connection -> [String] -> IO ()
-list dbh argv = putStrLn "list tasks"
+list dbh [] = do
+    r <- quickQuery dbh "SELECT desc FROM tasks WHERE done = 'f' ORDER BY due_date, created_ts" []
+    listOut (map fromSql (map head r))
 
+list dbh (x:[]) = do
+    r <- quickQuery dbh "SELECT desc FROM tasks WHERE desc LIKE ? AND done = 'f' ORDER BY due_date, created_ts" [toSql $ "%"++x++"%"]
+    listOut (map fromSql (map head r))
+
+listOut :: [String] -> IO ()
+listOut (x:xs) = do
+    putStrLn x
+    listOut xs
+
+listOut [] = do
+    putStrLn "\n"
+
+---- go to sqlite3 backend
 backend :: IO ()
 backend = putStrLn "launch sqlite3"
 
