@@ -60,6 +60,6 @@ DB schema:
 tasks
     id primary key
     desc text
-    due_date_ts integer
+    due_ts integer
     created_ts integer
     done boolean
