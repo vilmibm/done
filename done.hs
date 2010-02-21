@@ -40,8 +40,6 @@ done :: Connection -> [String] -> IO ()
 done dbh argv = putStrLn "finish a task"
 
 ---- list out tasks
---list :: Connection -> [String] -> IO ()
---list dbh argv = putStrLn "list tasks"
 list :: Connection -> [String] -> IO ()
 list dbh [] = do
     r <- quickQuery dbh "SELECT desc FROM tasks WHERE done = 'f' ORDER BY due_date, created_ts" []
