@@ -22,7 +22,7 @@ Usage:
 
 ###
 
-$: d a '7708 check logs again due:tomorrow'
+$: d a '7708 check logs again' -d tomorrow
 $: d a '7848 write trigger'
 $: d a '7848 write function'
 $: d l
