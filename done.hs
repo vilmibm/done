@@ -42,20 +42,18 @@ done dbh argv = putStrLn "finish a task"
 ---- list out tasks
 list :: Connection -> [String] -> IO ()
 list dbh [] = do
-    r <- quickQuery dbh "SELECT desc FROM tasks WHERE done = 'f' ORDER BY due_date, created_ts" []
+    r <- quickQuery dbh "SELECT desc FROM tasks WHERE done = 'f' ORDER BY due_ts, created_ts" []
     listOut (map fromSql (map head r))
 
 list dbh (x:[]) = do
-    r <- quickQuery dbh "SELECT desc FROM tasks WHERE desc LIKE ? AND done = 'f' ORDER BY due_date, created_ts" [toSql $ "%"++x++"%"]
+    r <- quickQuery dbh "SELECT desc FROM tasks WHERE desc LIKE ? AND done = 'f' ORDER BY due_ts, created_ts" [toSql $ "%"++x++"%"]
     listOut (map fromSql (map head r))
 
 listOut :: [String] -> IO ()
+listOut (x:[]) = do putStrLn x
 listOut (x:xs) = do
     putStrLn x
     listOut xs
-
-listOut [] = do
-    putStrLn "\n"
 
 ---- go to sqlite3 backend
 backend :: IO ()

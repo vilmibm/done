@@ -30,7 +30,7 @@ delete path = do
 install :: String -> IO ()
 install path = do
     dbh <- connectSqlite3 path
-    run dbh "CREATE TABLE tasks (id integer primary key, desc text, due_date integer, created_ts integer, done boolean)" []
+    run dbh "CREATE TABLE tasks (id integer primary key, desc text, due_ts integer, created_ts integer, done boolean)" []
     commit dbh
     putStrLn $ path ++ " created and installialized"
 
