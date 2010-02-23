@@ -37,7 +37,44 @@ parseDate due = "2011-02-21 19:55:17"
 
 ---- finish a task
 done :: Connection -> [String] -> IO ()
-done dbh argv = putStrLn "finish a task"
+done dbh argv =
+    case argv of
+        []     -> finishTask dbh
+        (x:[]) -> finishTaskFilter dbh x
+        _      -> help
+
+finishTask :: Connection -> IO ()
+finishTask dbh = do
+    r <- quickQuery dbh "SELECT desc FROM tasks WHERE done = 'f' ORDER BY due_ts, created_ts" []
+    putStrLn "finished with..."
+    donePrompt dbh (map fromSql (map head r))
+
+finishTaskFilter :: Connection -> String -> IO ()
+finishTaskFilter dbh desc = do
+    r <- quickQuery dbh "SELECT desc FROM tasks WHERE desc LIKE ? AND done = 'f' ORDER BY due_ts, created_ts" [toSql $ "%"++desc++"%"]
+    putStrLn "finished with..."
+    donePrompt dbh (map fromSql (map head r))
+
+donePrompt :: Connection -> [String] -> IO ()
+donePrompt dbh (x:[]) = do prompt dbh x
+donePrompt dbh (x:xs) = do
+    prompt dbh x
+    donePrompt dbh xs
+
+prompt :: Connection -> String -> IO ()
+prompt dbh desc = do
+    putStr $ "\t" ++ desc ++ "? [y/N] "
+    answer <- getLine
+    case answer of
+        "y" -> finishOff dbh desc
+        "Y" -> finishOff dbh desc
+        _   -> putStr ""
+
+finishOff :: Connection -> String -> IO ()
+finishOff dbh desc = do
+    run dbh "UPDATE tasks SET done='t' WHERE desc=?" [toSql desc]
+    commit dbh
+    putStrLn $ "\t\tX " ++ desc
 
 ---- list out tasks
 list :: Connection -> [String] -> IO ()
@@ -79,6 +116,7 @@ runCommand dbh cmd argv =
 
 main :: IO ()
 main = do
+    hSetBuffering stdout NoBuffering
     dbh <- connectDB 
     argv <- getArgs
     case argv of
