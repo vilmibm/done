@@ -8,7 +8,13 @@ import System.Environment ( getArgs )
 import Database.HDBC
 import Database.HDBC.Sqlite3
 
--- adlbh
+insertSql :: String -> String
+insertSql "nodue" = "INSERT INTO tasks VALUES (null, ?, null, (SELECT CURRENT_TIMESTAMP), 'f')"
+insertSql "due"   = "INSERT INTO tasks VALUES (null, ?, ?, (SELECT CURRENT_TIMESTAMP), 'f')"
+
+listSql :: String -> String
+listSql "filter"   = "SELECT desc FROM tasks WHERE desc LIKE ? AND done = 'f' ORDER BY due_ts, created_ts"
+listSql "nofilter" = "SELECT desc FROM tasks WHERE done = 'f' ORDER BY due_ts, created_ts"
 
 ---- add task
 add :: Connection -> [String] -> IO ()
@@ -21,13 +27,13 @@ add dbh argv = do
 
 insertTask :: Connection -> String -> IO ()
 insertTask dbh desc = do
-    run dbh "INSERT INTO tasks VALUES (null, ?, null, (SELECT CURRENT_TIMESTAMP), 'f')" [toSql desc]
+    run dbh (insertSql "nodue") [toSql desc]
     commit dbh
     putStrLn $ "\tadded " ++ desc
 
 insertTaskDueDate :: Connection -> String -> String -> IO ()
 insertTaskDueDate dbh desc due = do
-    run dbh "INSERT INTO tasks VALUES (null, ?, ?, (SELECT CURRENT_TIMESTAMP), 'f')" [toSql desc, (toSql (parseDate due))]
+    run dbh (insertSql "due") [toSql desc, (toSql (parseDate due))]
     commit dbh
     putStrLn $ "\tadded " ++ desc ++ " (due: " ++ (parseDate due) ++ ")"
 
@@ -45,13 +51,13 @@ done dbh argv =
 
 finishTask :: Connection -> IO ()
 finishTask dbh = do
-    r <- quickQuery dbh "SELECT desc FROM tasks WHERE done = 'f' ORDER BY due_ts, created_ts" []
+    r <- quickQuery dbh (listSql "nofilter") []
     putStrLn "finished with..."
     donePrompt dbh (map fromSql (map head r))
 
 finishTaskFilter :: Connection -> String -> IO ()
 finishTaskFilter dbh desc = do
-    r <- quickQuery dbh "SELECT desc FROM tasks WHERE desc LIKE ? AND done = 'f' ORDER BY due_ts, created_ts" [toSql $ "%"++desc++"%"]
+    r <- quickQuery dbh (listSql "filter") [toSql $ "%"++desc++"%"]
     putStrLn "finished with..."
     donePrompt dbh (map fromSql (map head r))
 
@@ -79,11 +85,11 @@ finishOff dbh desc = do
 ---- list out tasks
 list :: Connection -> [String] -> IO ()
 list dbh [] = do
-    r <- quickQuery dbh "SELECT desc FROM tasks WHERE done = 'f' ORDER BY due_ts, created_ts" []
+    r <- quickQuery dbh (listSql "nofilter") []
     listOut (map fromSql (map head r))
 
 list dbh (x:[]) = do
-    r <- quickQuery dbh "SELECT desc FROM tasks WHERE desc LIKE ? AND done = 'f' ORDER BY due_ts, created_ts" [toSql $ "%"++x++"%"]
+    r <- quickQuery dbh (listSql "filter") [toSql $ "%"++x++"%"]
     listOut (map fromSql (map head r))
 
 listOut :: [String] -> IO ()
@@ -107,9 +113,12 @@ connectDB = do
 runCommand :: Connection -> String -> [String] -> IO ()
 runCommand dbh cmd argv =
     case cmd of
-        "a" -> add dbh argv
-        "d" -> done dbh argv
-        "l" -> list dbh argv
+        "a"    -> add dbh argv
+        "add"  -> add dbh argv
+        "d"    -> done dbh argv
+        "done" -> done dbh argv
+        "l"    -> list dbh argv
+        "list" -> list dbh argv
         "b" -> backend
         "h" -> help
         _   -> putStrLn $ "I don't understand: " ++ cmd
@@ -117,7 +126,7 @@ runCommand dbh cmd argv =
 main :: IO ()
 main = do
     hSetBuffering stdout NoBuffering
-    dbh <- connectDB 
+    dbh  <- connectDB 
     argv <- getArgs
     case argv of
         [] -> help
