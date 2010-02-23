@@ -7,23 +7,25 @@ It was inspired by:
     timebook.py
     todo.sh
     remember the milk
+    kOrganizer
 and aims to distill my favorite aspects of each of these tools into one, useful tool.
 
 It's written in Haskell because I want to learn Haskell.
 
 It uses sqlite3.
 
-Note: I'm still a fledgling Haskell programmer. Progress on this project will be glacial.
+Note: I'm still a fledgling Haskell programmer. Progress on this project s/will be glacial/is going faster than I thought.
 
 NOTES:
 currently implemented:
     adding (but not due dates)
+    finishing
     listing
 
 stubbed:
+    sorting
     due dates
     go to backend
-    finishing
     better usage message
 
 Design notes:
