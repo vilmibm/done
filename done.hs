@@ -16,6 +16,9 @@ listSql :: String -> String
 listSql "filter"   = "SELECT desc FROM tasks WHERE desc LIKE ? AND done = 'f' ORDER BY due_ts, created_ts"
 listSql "nofilter" = "SELECT desc FROM tasks WHERE done = 'f' ORDER BY due_ts, created_ts"
 
+indent :: String
+indent = "  "
+
 ---- add task
 add :: Connection -> [String] -> IO ()
 add dbh argv = do
@@ -29,13 +32,13 @@ insertTask :: Connection -> String -> IO ()
 insertTask dbh desc = do
     run dbh (insertSql "nodue") [toSql desc]
     commit dbh
-    putStrLn $ "\tadded " ++ desc
+    putStrLn $ (indent) ++ "added " ++ desc
 
 insertTaskDueDate :: Connection -> String -> String -> IO ()
 insertTaskDueDate dbh desc due = do
     run dbh (insertSql "due") [toSql desc, (toSql (parseDate due))]
     commit dbh
-    putStrLn $ "\tadded " ++ desc ++ " (due: " ++ (parseDate due) ++ ")"
+    putStrLn $ (indent) ++ "added " ++ desc ++ " (due: " ++ (parseDate due) ++ ")"
 
 -- stubbed for now:
 parseDate :: String -> String
@@ -69,7 +72,7 @@ donePrompt dbh (x:xs) = do
 
 prompt :: Connection -> String -> IO ()
 prompt dbh desc = do
-    putStr $ "\t" ++ desc ++ "? [y/N] "
+    putStr $ (indent) ++ "* " ++ desc ++ "? [yN]: "
     answer <- getLine
     case answer of
         "y" -> finishOff dbh desc
@@ -80,7 +83,7 @@ finishOff :: Connection -> String -> IO ()
 finishOff dbh desc = do
     run dbh "UPDATE tasks SET done='t' WHERE desc=?" [toSql desc]
     commit dbh
-    putStrLn $ "\t\tX " ++ desc
+    putStrLn $ (indent) ++ (indent) ++ "X " ++ desc
 
 ---- list out tasks
 list :: Connection -> [String] -> IO ()
@@ -93,9 +96,9 @@ list dbh (x:[]) = do
     listOut (map fromSql (map head r))
 
 listOut :: [String] -> IO ()
-listOut (x:[]) = do putStrLn x
+listOut (x:[]) = do putStrLn $ (indent) ++ "* " ++ x
 listOut (x:xs) = do
-    putStrLn x
+    putStrLn $ (indent) ++ "* " ++ x
     listOut xs
 
 ---- go to sqlite3 backend
