@@ -55,14 +55,18 @@ done dbh argv =
 finishTask :: Connection -> IO ()
 finishTask dbh = do
     r <- quickQuery dbh (listSql "nofilter") []
-    putStrLn "finished with..."
-    donePrompt dbh (map fromSql (map head r))
+    case r of
+        [] -> putStr ""
+        _  -> do putStrLn "finished with..."
+                 donePrompt dbh (map fromSql (map head r))
 
 finishTaskFilter :: Connection -> String -> IO ()
 finishTaskFilter dbh desc = do
     r <- quickQuery dbh (listSql "filter") [toSql $ "%"++desc++"%"]
-    putStrLn "finished with..."
-    donePrompt dbh (map fromSql (map head r))
+    case r of
+        [] -> putStr ""
+        _  -> do putStrLn "finished with..."
+                 donePrompt dbh (map fromSql (map head r))
 
 donePrompt :: Connection -> [String] -> IO ()
 donePrompt dbh (x:[]) = do prompt dbh x
@@ -96,6 +100,7 @@ list dbh (x:[]) = do
     listOut (map fromSql (map head r))
 
 listOut :: [String] -> IO ()
+listOut []     = putStr ""
 listOut (x:[]) = do putStrLn $ (indent) ++ "* " ++ x
 listOut (x:xs) = do
     putStrLn $ (indent) ++ "* " ++ x
