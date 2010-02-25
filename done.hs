@@ -47,41 +47,25 @@ parseDate due = "2011-02-21 19:55:17"
 ---- finish a task
 done :: Connection -> [String] -> IO ()
 done dbh argv =
-    case argv of
-        []     -> finishTask dbh
-        (x:[]) -> finishTaskFilter dbh x
-        _      -> help
+    case argv of 
+        []     -> do
+            r <- quickQuery dbh (listSql "nofilter") []
+            finishTasks dbh (map fromSql (map head r))
+        (x:[]) -> do
+            r <- quickQuery dbh (listSql "filter") [toSql $ "%"++x++"%"]
+            finishTasks dbh (map fromSql (map head r))
+        _      -> help    
 
-finishTask :: Connection -> IO ()
-finishTask dbh = do
-    r <- quickQuery dbh (listSql "nofilter") []
-    case r of
-        [] -> putStr ""
-        _  -> do putStrLn "finished with..."
-                 donePrompt dbh (map fromSql (map head r))
-
-finishTaskFilter :: Connection -> String -> IO ()
-finishTaskFilter dbh desc = do
-    r <- quickQuery dbh (listSql "filter") [toSql $ "%"++desc++"%"]
-    case r of
-        [] -> putStr ""
-        _  -> do putStrLn "finished with..."
-                 donePrompt dbh (map fromSql (map head r))
-
-donePrompt :: Connection -> [String] -> IO ()
-donePrompt dbh (x:[]) = do prompt dbh x
-donePrompt dbh (x:xs) = do
-    prompt dbh x
-    donePrompt dbh xs
-
-prompt :: Connection -> String -> IO ()
-prompt dbh desc = do
-    putStr $ (indent) ++ "* " ++ desc ++ "? [yN]: "
+finishTasks :: Connection -> [String] -> IO ()
+finishTasks dbh [] = putStr ""
+finishTasks dbh (x:xs)  = do
+    putStr $ (indent) ++ "* " ++ x ++ "? [yN]: "
     answer <- getLine
     case answer of
-        "y" -> finishOff dbh desc
-        "Y" -> finishOff dbh desc
+        "y" -> finishOff dbh x
+        "Y" -> finishOff dbh x
         _   -> putStr ""
+    finishTasks dbh xs
 
 finishOff :: Connection -> String -> IO ()
 finishOff dbh desc = do
@@ -101,7 +85,6 @@ list dbh (x:[]) = do
 
 listOut :: [String] -> IO ()
 listOut []     = putStr ""
-listOut (x:[]) = do putStrLn $ (indent) ++ "* " ++ x
 listOut (x:xs) = do
     putStrLn $ (indent) ++ "* " ++ x
     listOut xs
