@@ -23,8 +23,9 @@ indent = "  "
 add :: Connection -> [String] -> IO ()
 add dbh argv = do
     case argv of
-        (x:[])     -> insertTask dbh (head argv)
-        (x:y:z:[]) -> insertTaskDueDate dbh (head argv) (last argv)
+        (desc:[])          -> insertTask dbh desc
+        ("-d":due:desc:[]) -> insertTaskDueDate dbh desc due
+        (desc:"-d":due:[]) -> insertTaskDueDate dbh desc due
         []         -> help
         _          -> help
 
@@ -59,11 +60,11 @@ done dbh argv =
 finishTasks :: Connection -> [String] -> IO ()
 finishTasks dbh [] = putStr ""
 finishTasks dbh (x:xs)  = do
-    putStr $ (indent) ++ "* " ++ x ++ "? [yN]: "
+    putStr $ (indent) ++ "* " ++ x ++ "? [dN]: "
     answer <- getLine
     case answer of
-        "y" -> finishOff dbh x
-        "Y" -> finishOff dbh x
+        "d" -> finishOff dbh x
+        "D" -> finishOff dbh x
         _   -> putStr ""
     finishTasks dbh xs
 
@@ -74,6 +75,7 @@ finishOff dbh desc = do
     putStrLn $ (indent) ++ (indent) ++ "X " ++ desc
 
 ---- list out tasks
+-- XXX add -s logic
 list :: Connection -> [String] -> IO ()
 list dbh [] = do
     r <- quickQuery dbh (listSql "nofilter") []
