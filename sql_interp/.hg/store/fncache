@@ -1,0 +1,6 @@
+data/.hgignore.i
+data/LICENSE.i
+data/README.i
+data/esc_types.py.i
+data/sql_interp.py.i
+data/tests/test_sql_interp.py.i

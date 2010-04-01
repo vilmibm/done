@@ -1,0 +1,7 @@
+syntax: glob
+*.pyc
+*.pyo
+*.swp
+cover/
+.coverage
+docs/_build

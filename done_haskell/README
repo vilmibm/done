@@ -10,23 +10,37 @@ It was inspired by:
     kOrganizer
 and aims to distill my favorite aspects of each of these tools into one, useful tool.
 
-It was initially written in Haskell as a pedagogical exercise. I found that I was beginning to rely on it but was having trouble getting into Haskell enough to really make it code I was proud of. So I rewrote it in Python.
+It's written in Haskell because I want to learn Haskell.
 
 It uses sqlite3.
 
+Note: I'm still a fledgling Haskell programmer. Progress on this project s/will be glacial/is going faster than I thought.
+
 NOTES:
+currently implemented:
+    adding (but not due dates)
+    finishing
+    listing
+
+stubbed:
+    sorting
+    due dates
+    go to backend
+    better usage message
 
 Design notes:
 
 Usage:
     d a [-d due] task
         add a task, optional natural language due date
-    d l [-s (due|created)] [filter...]
-        list out tasks, optional sort, optional filters
-    d d [filter...]
-        go through tasks to mark finished ones, optional filters
+    d l [-s (due|created|alpha)] [filter]
+        list out tasks, optional sort, optional filter
+    d d [filter]
+        go through tasks to mark finished ones, optional filter
     d b
         launch sqlite3 backend
+    d h
+        help message
 ###
 
 $: d a '7708 check logs again' -d tomorrow
@@ -67,6 +81,6 @@ DB schema:
 tasks
     id primary key
     desc text
-    due integer
-    created integer
-    done boolean default 0
+    due_ts integer
+    created_ts integer
+    done boolean

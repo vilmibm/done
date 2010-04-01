@@ -1,0 +1,3 @@
+Interpolate python variables into SQL based upon context.
+
+Indirect port of Perl's SQL::Interp.
