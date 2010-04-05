@@ -4,8 +4,8 @@
 # where midwest usa
 
 import sys
-from time import mktime, localtime, time, strftime
-from datetime import date
+from time import mktime, time
+from datetime import datetime
 
 import sqlite3
 from termcolor import colored
@@ -16,11 +16,12 @@ from Config import db_path
 
 class Task:
     def __init__(self, desc, due):
-        self.due    = due
         self.desc   = desc
         self.si     = si.SQLInterp()
         self.db     = sqlite3.connect(db_path)
         self.c      = self.db.cursor()
+
+        self.due = datetime.fromtimestamp(due) if due else None
 
     def add(self):
         insert = {
@@ -28,7 +29,7 @@ class Task:
             "created" : time()
         }
         if self.due:
-            insert["due"] = self.due
+            insert["due"] = mktime(self.due.timetuple())
 
         interped = self.si.interp("INSERT INTO tasks", insert)
 
@@ -48,8 +49,6 @@ class Task:
 
     def finish(self):
         where = { "desc":self.desc }
-#        if self.due:
-#            where["due"] = mktime(self.dp.parse(self.due)[0])
 
         interped = self.si.interp("UPDATE tasks SET done=1 WHERE", where)
 
@@ -60,15 +59,31 @@ class Task:
         if not self.due:
             return ""
 
-        diff = abs(time() - self.due)
+        due_string = self.due.strftime("%a, %Y-%m-%d %X")
 
-        color = "green"
-        if diff / 60.0 / 60.0 < 12:
-            color = "red"
-        elif diff / 60.0 / 60.0 < 24:
-            color = "yellow"
+        overdue = lambda s: colored(s, "white", "on_red")
+        red     = lambda s: colored(s, "red")
+        yellow  = lambda s: colored(s, "yellow")
+        green   = lambda s: colored(s, "green")
 
-        return colored("due: %s" % strftime("%a, %Y-%m-%d %X", localtime(self.due)), color)
+        now = datetime.now()
+
+        delta = self.due - now
+        hours = delta.seconds / 60.0 / 60.0
+
+        if delta.days < 0: # overdue
+            due_string = overdue(due_string)
+        
+        if delta.days == 0:
+            due_string = red(due_string)
+        
+        if delta.days == 1:
+            due_string = yellow(due_string)
+        
+        if delta.days > 1:
+            due_string = green(due_string)
+            
+        return due_string
 
     def __str__(self):
         due_string = self.pretty_due()
