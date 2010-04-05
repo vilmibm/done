@@ -1,0 +1,12 @@
+1.0.3
+    - correctly init path where db is stored (thanks Fabien)
+
+1.0.2
+    - correctly init db schema on first run
+
+1.0.1
+    - fix coloring error
+    - handle ArgError appropriately
+
+1.0.0
+    initial release
