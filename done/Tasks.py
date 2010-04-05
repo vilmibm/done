@@ -69,7 +69,6 @@ class Task:
         now = datetime.now()
 
         delta = self.due - now
-        hours = delta.seconds / 60.0 / 60.0
 
         if delta.days < 0: # overdue
             due_string = overdue(due_string)
