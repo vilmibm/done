@@ -37,6 +37,6 @@ class Query:
 
         filtset = set(self.filters)
 
-        matches = filter(lambda r: set(r["desc"].split()) > filtset, rows)
+        matches = filter(lambda r: set(r["desc"].split()) >= filtset, rows)
 
         return matches
