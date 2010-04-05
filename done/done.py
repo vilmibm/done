@@ -43,6 +43,7 @@ def handle_error(error, op):
 def maybe_init_db():
     db_path = Config.db_path
     if not os.path.isfile(db_path):
+        os.makedirs(os.path.dirname(db_path))
         db = sqlite3.connect(db_path)
         c  = db.cursor()
 
