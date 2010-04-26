@@ -28,7 +28,7 @@ def main():
     
     try:
         command = Commands.match(command, options, args)
-    except Commands.ArgError as e:
+    except Commands.ArgError, e:
         return handle_error(e.value, op)
 
     Commands.run(command, options, args)
