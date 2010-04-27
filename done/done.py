@@ -53,7 +53,7 @@ def maybe_init_db():
                 id integer primary key, \
                 desc text, \
                 due integer, \
-                created itneger, \
+                created integer, \
                 done boolean default 0 \
             ) \
         ")
