@@ -46,12 +46,28 @@ class Task:
             return True
 
         return False
+        
+    def remove(self):
+        sys.stdout.write("\t * " + str(self) + "? ")
+        answer = raw_input("[rmN]:") 
+        if answer == "rm":
+            self.delete()
+            return True
+        return False
 
     def finish(self):
         where = { "desc":self.desc }
 
         interped = self.si.interp("UPDATE tasks SET done=1 WHERE", where)
 
+        self.c.execute(interped[0], interped[1])
+        self.db.commit()
+    
+    def delete(self):
+        where = { "desc":self.desc }
+    
+        interped = self.si.interp("DELETE FROM tasks WHERE", where)
+    
         self.c.execute(interped[0], interped[1])
         self.db.commit()
 

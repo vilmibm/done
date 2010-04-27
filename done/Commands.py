@@ -12,11 +12,12 @@ from Tasks   import Task
 from Queries import Query
 from Config  import db_path
 
-commands = ['list', 'done', 'add', 'backend']
+commands = ['list', 'done', 'remove', 'add', 'backend']
 
 num_args = {
     "list"    : lambda n: n >= 0,
     "done"    : lambda n: n >= 0,
+    "remove"    : lambda n: n >= 0,
     "add"     : lambda n: n >= 1,
     "backend" : lambda n: n == 0
 }
@@ -57,6 +58,22 @@ def run(command, options, args):
         print "finished tasks:"
         for t in finished_tasks:
             print "\t X", t
+    
+    if command == "remove":
+        print "remove..."
+        removed_tasks = []
+        for t in tasks: 
+            removed = t.remove()
+            if removed:
+                removed_tasks.append(t)
+    
+        if not removed_tasks:
+            return
+    
+        print ""
+        print "removed tasks:"
+        for t in removed_tasks:
+            print "\t RM", t
 
 class ArgError(Exception):
     def __init__(self, value):
