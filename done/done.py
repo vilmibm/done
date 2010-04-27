@@ -15,7 +15,8 @@ import Commands
 
 def main():
     maybe_init_db()
-    op = OptionParser(usage="usage: %prog [options] ladb [arg1...]")
+    op = OptionParser(usage="usage: %prog [options] ladbr [arg1...]")
+    op.add_option("-f", "--finished", dest="finished", action="store_true", help="show only finished tasks")
     op.add_option("-d", "--due", dest="due",  help="specify a due date")
     op.add_option("-s", "--sort",dest="sort", default="due", help="sort by created, alpha, pri, due date")
 

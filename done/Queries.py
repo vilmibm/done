@@ -10,17 +10,20 @@ from time import mktime, localtime, strftime
 from Config import db_path
 
 class Query:
-    def __init__(self, filters, due, sort):
-        self.filters = filters
-        self.due     = due
-        self.sort    = sort
-        self.dp      = pdt.Calendar()
-        self.si      = si.SQLInterp()
-        self.db      = sqlite3.connect(db_path)
-        self.c       = self.db.cursor()
+    def __init__(self, filters, options):
+        self.filters    = filters
+        self.due        = options.due
+        self.sort       = options.sort
+        self.finished   = options.finished
+        self.dp         = pdt.Calendar()
+        self.si         = si.SQLInterp()
+        self.db         = sqlite3.connect(db_path)
+        self.c          = self.db.cursor()
 
     def find(self):
-        criteria = { "done":0 }
+        criteria = {"done": 0}
+        if self.finished:
+            criteria["done"] = 1
         if self.due:
             criteria["due"] = mktime(self.dp.parse(self.due)[0])
 
