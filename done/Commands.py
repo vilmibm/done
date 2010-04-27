@@ -32,7 +32,7 @@ def run(command, options, args):
         dp = pdt.Calendar()
         due = mktime(dp.parse(options.due)[0]) if options.due else None
         print "added tasks..."
-        [Task(desc, options.due).add() for desc in args]
+        [Task(desc, due).add() for desc in args]
         return
 
     filters = args if len(args) else None
