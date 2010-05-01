@@ -10,7 +10,9 @@ It was inspired by:
     kOrganizer
 and aims to distill my favorite aspects of each of these tools into one, useful tool.
 
-It was initially written in Haskell as a pedagogical exercise. I found that I was beginning to rely on it but was having trouble getting into Haskell enough to really make it code I was proud of. So I rewrote it in Python.
+It was initially written in Haskell as a pedagogical exercise. I found that I
+was beginning to rely on it but was having trouble getting into Haskell enough
+to really make it code I was proud of. So I rewrote it in Python.
 
 It uses sqlite3.
 
@@ -21,10 +23,12 @@ Design notes:
 Usage:
     d a [-d due] task
         add a task, optional natural language due date
-    d l [-s (due|created)] [filter...]
+    d l [-s (due|created)] [-f] [filter...]
         list out tasks, optional sort, optional filters
     d d [filter...]
         go through tasks to mark finished ones, optional filters
+    d r [filter...]
+        go through tasks to remove them from the list
     d b
         launch sqlite3 backend
 ###
@@ -36,23 +40,17 @@ $: d l
     7708 check logs again (due 17 Feb 2010)
     7848 write trigger
     7848 write function
-$: d l -s name
-    7708 check logs again (due 17 Feb 2010)
-    7848 write function
-    7848 write trigger
 $: d l 7848
     7848 write trigger
     7848 write function
-$: d l 'due:tomorrow'
-    7708 check logs again (due 17 Feb 2010)
 $: d d 7708
     finished with...
-        7708 check logs again (due 17 Feb 2010)? [y/N]:y
+        7708 check logs again (due 17 Feb 2010)? [yN]:y
     X 7708 check logs again (due 17 Feb 2010)
 $: d d 7848
     finished with...
-        7848 write trigger? [y/N]:y
-        7848 write function? [y/N]:n
+        7848 write trigger? [yN]:y
+        7848 write function? [yN]:n
     X 7848 write trigger
 $: d l
     7848 write function
