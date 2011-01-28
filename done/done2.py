@@ -37,18 +37,21 @@ class Commands:
             return 1
 
         try:
-            command = self.match_command(args.pop())
-            getattr(self, command)()
+            self.match_command(args.pop(0))()
         except Exception, e:
             print "Exception: %s" % e
             self.op.print_help()
             return 1
 
     def match_command(self, command):
-        funs = [getattr(self,f) for f in dir(self) if type(getattr(self,f)) == types.MethodType]
-        funs = [fname.__name__ for fname in funs if fname.__name__.startswith('command_')]
-        build = "command_"
-        possible = funs
+        def member_is_command(fname):
+            member = getattr(self, fname)
+            if type(member) == types.MethodType:
+                return member.__name__.startswith('command_')
+
+        fnames = [member for member in dir(self) if member_is_command(member)]
+        build = ""
+        possible = fnames
         for letter in command:
             build += letter
             possible = filter(lambda w: w.startswith(build), possible)
@@ -59,9 +62,9 @@ class Commands:
         if len(possible) > 1:
             raise ValueError("Ambiguous command: %s" % command)
 
-        return possible.pop().split('command_')[1]
+        return getattr(self, possible.pop())
 
-    # filter
+    # decorator
     def command(fun):
         fun.__name__ = "command_%s" % fun.__name__
         return fun
