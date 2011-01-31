@@ -69,6 +69,20 @@ class Commands:
         fun.__name__ = "command_%s" % fun.__name__
         return fun
 
+    def options():
+        op.add_option("-f", "--finished", dest="finished", action="store_true", help="show only finished tasks")
+        op.add_option("-d", "--due", dest="due",  help="specify a due date")
+        op.add_option("-s", "--sort",dest="sort", default="due", help="sort by created, alpha, pri, due date")
+
+        options = [
+            {
+                'name' : 'due',
+                'help' : 'show only finished tasks'
+            }
+        ]
+
+        return options
+
     @property
     def opt_parser(self):
         return self.op
