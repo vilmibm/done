@@ -42,4 +42,6 @@ class done(TofuApp):
         }
 
 if __name__ == '__main__':
+    database.connect()
+    Task.create_table()
     sys.exit( app().run() )
