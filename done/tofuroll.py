@@ -60,6 +60,7 @@ class TofuApp:
         try:
             command = self.match_command(args.pop(0))
             command(options, args)
+            return 0
         except Exception, e:
             print "Exception: %s" % e
             self.op.print_help()
