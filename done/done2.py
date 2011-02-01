@@ -37,7 +37,8 @@ class Commands:
             return 1
 
         try:
-            self.match_command(args.pop(0))()
+            command = self.match_command(args.pop(0))
+            return command()
         except Exception, e:
             print "Exception: %s" % e
             self.op.print_help()
