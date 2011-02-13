@@ -30,11 +30,14 @@ class Task(peewee.Model):
         database = database
 
     def __unicode__(self):
-        ustr = u'desc'
+        ustr = unicode(self.desc)
         if self.due_date:
             ustr += ( u' (due: %s)' % self.due_date)
 
         return ustr
+
+    def __str__(self):
+        return unicode(self)
 
 class done(TofuApp):
     @command
