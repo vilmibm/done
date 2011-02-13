@@ -14,13 +14,12 @@
 
 import sys
 
+from tofuroll import *
 import peewee
 
-from tofuroll import *
-from peewee import database
+import config
 
-DATABASE = 'done2.db'
-database = peewee.Database(DATABASE)
+database = peewee.Database(peewee.SqliteAdapter(), config.db_path)
 
 class Task(peewee.Model):
     desc      = peewee.CharField()
