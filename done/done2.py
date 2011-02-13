@@ -85,5 +85,9 @@ class done(TofuApp):
 
 if __name__ == '__main__':
     database.connect()
-    Task.create_table()
-    sys.exit( app().run() )
+    # This could be more elegant. Works for now.
+    try:
+        Task.create_table()
+    except:
+        pass
+    sys.exit( done().run() )
