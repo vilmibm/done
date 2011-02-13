@@ -41,12 +41,40 @@ class Task(peewee.Model):
 
 class done(TofuApp):
     @command
-    def add(self, options, *args):
-        print "adding a task"
+    def add(self, options, args):
+        try:
+            desc = args.pop()
+        except:
+            raise ValueError("add command needs exactly 1 argument")
+
+        t = Task(desc=desc, due_date=None, done=False)
+        t.save()
+        print "added '%s'" % t
 
     @command
-    def list(self, options, *args):
-        print "listing tasks"
+    def list(self, options, args):
+        tasks = Task.select().where(done=False)
+        for t in tasks:
+            print t
+
+    @command
+    def done(self, options, args):
+        tasks = Task.select().where(done=False)
+        for t in tasks:
+            answer = raw_input("done with '%s'? [yN]: " % t)
+            if answer.lower().startswith('y'):
+                t.done = True
+                t.save()
+
+    @command
+    def remove(self, options, args):
+        tasks = Task.select().where(done=False)
+        for t in tasks:
+            answer = raw_input("remove '%s'? [yN]: " % t)
+            if answer.lower().startswith('y'):
+                Task.delete().where(desc=t.id)
+                t.done = True
+                t.save()
 
     @option
     def due_date(self):
