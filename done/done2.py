@@ -23,7 +23,7 @@ database = peewee.Database(peewee.SqliteAdapter(), config.db_path)
 
 class Task(peewee.Model):
     desc      = peewee.CharField()
-    due_date  = peewee.DateTimeField()
+    due_date  = peewee.DateTimeField(null=True)
     done      = peewee.BooleanField()
 
     class Meta:
